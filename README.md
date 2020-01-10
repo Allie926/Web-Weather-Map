@@ -10,4 +10,4 @@ Weather data includes:
 - Temperature (F, C, K)
 - Wind speeds (m/s, km/hr, mph)
 
-*Code uploaded here due to expiration of Google Maps API key
+*Google Maps API key expired, causing the API to not function as intended anymore*
