@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Simple Map</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"/>
+	<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+    <style>
+		html, body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+		#map {
+			height: 100%;
+		}
+		.UI{
+			color:black;
+			font-weight:bold;
+			height:35px;
+			width:100px;
+			z-index:100;
+		}
+		#searchin{
+			width:65%;
+			padding-left:3px;
+		}
+		#searchBtn{
+			width:30%;
+		}
+		#dropTitle{
+			width:55%;
+			margin-top:10px;
+			padding-left:3px;
+		}
+		#dropdown{
+			width:40%;
+			margin-top:10px;
+		}
+		#windTitle{
+			width:55%;
+			margin-top:10px;
+			padding-left:3px;
+		}
+		#windDown{
+			width:40%;
+			margin-top:10px;
+		}
+		#content{
+			padding-left:3px;
+			background-color:white;
+			border:solid gray 1px;
+			top:340px;
+			left:10px;
+			width:95%;
+			height:100px;
+			padding-left:5px;
+			margin-top:10px;
+		}
+		p{
+			margin:0px;
+			top:0px;
+			left:0px;
+		}
+		nav{
+			position:absolute;
+			top:60px;
+			left:-30px;
+		}
+		#menuToggle
+		{
+			display: block;
+			position: relative;
+			top: 50px;
+			left: 50px;
+		  
+			z-index: 1;
+		  
+			-webkit-user-select: none;
+			user-select: none;
+		}
+		#menuToggle #menuInput
+		{
+			display: block;
+			width: 40px;
+			height: 32px;
+			position: absolute;
+			top: -7px;
+			left: -5px;
+		  
+			cursor: pointer;
+		  
+			opacity: 0; /* hide this */
+			z-index: 2; /* and place it over the hamburger */
+		  
+			-webkit-touch-callout: none;
+		}
+		/*
+		 *	Just a quick hamburger
+		 */
+		#menuToggle span
+		{
+			display: block;
+			width: 33px;
+			height: 4px;
+			margin-bottom: 5px;
+			position: relative;
+		  
+			background: #000000;
+			border-radius: 3px;
+		  
+			z-index: 1;
+		  
+			transform-origin: 4px 0px;
+		  
+			transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+						background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+						opacity 0.55s ease;
+		}
+		#menuToggle span:first-child
+		{
+			transform-origin: 0% 0%;
+		}
+		#menuToggle span:nth-last-child(2)
+		{
+			transform-origin: 0% 100%;
+		}
+		/* 
+		 *	Transform all the slices of hamburger
+		 *	into a crossmark.
+		 */
+		#menuToggle input:checked ~ span
+		{
+			opacity: 1;
+			transform: rotate(45deg) translate(-2px, -1px);
+			background: #232323;
+		}
+		/*
+		 *	But let's hide the middle one.
+		 */
+		#menuToggle input:checked ~ span:nth-last-child(3)
+		{
+			opacity: 0;
+			transform: rotate(0deg) scale(0.2, 0.2);
+		}
+		/*
+		 *	Ohyeah and the last one should go the other direction
+		 */
+		#menuToggle input:checked ~ span:nth-last-child(2)
+		{
+			transform: rotate(-45deg) translate(0, -1px);
+		}
+		/*
+		 *	Make this absolute positioned
+		 *	at the top left of the screen
+		 */
+		#menu
+		{
+			position: absolute;
+			width: 300px;
+			margin: -40px 0 0 -20px;
+			padding: 10px;
+			padding-top: 50px;
+		  
+			background: #fafafa;
+			border: solid black 1px;
+			list-style-type: none;
+			-webkit-font-smoothing: antialiased;
+			/* to stop flickering of text in safari */
+		  
+			transform-origin: 0% 0%;
+			transform: translate(-100%, 0);
+		  
+			transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0);
+		}
+		#menu li
+		{
+			padding: 10px 0;
+			font-size: 22px;
+		}
+		/*
+		 *	And let's slide it in from the left
+		 */
+		#menuToggle input:checked ~ ul
+		{
+			transform: none;
+		}
+    </style>
+	
+  </head>
+  <body>
+    <div id="map"></div>
+		<div id="app">
+			<nav role="navigation">
+			  <div id="menuToggle">
+				<!--
+				hidden checkbox used as click receiver for hamburger menu
+				-->
+				<input id="menuInput" type="checkbox" />
+				
+				<!--
+				spans act as hamburger menu
+				-->
+				<span></span>
+				<span></span>
+				<span></span>
+
+				<!--
+				all UI inside of menu list
+				-->
+				<ul id="menu">
+					<p>
+						<input class="UI" id="searchin" type="text" placeholder="Search Box" v-model="location">
+						<button class="UI" id="searchBtn" type="submit" v-on:click="search">Search</button>
+					</p>
+					<p>
+						<input class="UI" id="dropTitle" type="text" value="Temperature in:" readonly>
+						<select class="UI" id="dropdown" v-model="temperatureType" v-on:change="search">
+							<option value="fahrenheit">Fahrenheit</option>
+							<option value="celsius">Celsius</option>
+							<option value="kelvin">Kelvin</option>
+						</select>
+					</p>
+					<p>
+						<input class="UI" id="windTitle" type="text" value="Wind in:" readonly>
+						<select class="UI" id="windDown" v-model="windType" v-on:change="search">
+							<option value="m/s">M/S</option>
+							<option value="km/hr">Km/Hr</option>
+							<option value="mi/hr">Mi/Hr</option>
+						</select>
+					</p>
+					<div class="UI" id="content">
+						<p>Location: {{location}}</p>
+						<p>Temperature: {{temperature.toFixed(3)}}</p>
+						<p>Weather: {{this.result.weather[0].description}}</p>
+						<p>Wind: {{this.wind.toFixed(3)}}</p>
+					</div>
+				</ul>
+			  </div>
+			</nav>
+		</div>
+	<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+	<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+	<script src="js/classes.js"></script>
+    <script src="js/main.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOOg1OjGnGnTsgZXs3JfjYNqtqGkqX__A&callback=initMap" async defer></script>
+	<script src="https://api.openweathermap.org/data/2.5/forecast?id=524901&APPID=2ceb8bb81968f59ab2df713630ae5180"></script>
+  </body>
+</html>

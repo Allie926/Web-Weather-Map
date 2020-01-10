@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>Firebase Admin</title>
+	<style>
+		th{
+			padding-right: 20px;
+		}
+		#header{
+			text-decoration:underline;
+		}
+	</style>
+</head>
+<body>
+<h1>Searches</h1>
+<div id="app">
+	<table>
+		<tr id="header">
+			<th>Location</th>
+			<th>Weather</th>
+			<th>Temperature</th>
+			<th>Temp. Units</th>
+			<th>Wind</th>
+			<th>Wind Units</th>
+		</tr>
+		<tr v-for="e in elements">
+			<th>{{e.location}}</th>
+			<th>{{e.weather}}</th>
+			<th>{{e.temperature.toFixed(3)}}</th>
+			<th>{{e.tempType}}</th>
+			<th>{{e.wind.toFixed(3)}}</th>
+			<th>{{e.windType}}</th>
+		</tr>
+	</table>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+<script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.7.0/firebase.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
